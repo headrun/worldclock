@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head>
+		<title>The World Clock</title>
+
+		<link rel="stylesheet" type="text/css" href="styles2.css"/>
+		<style>
+            body {
+                background: black;
+            }
+		    #container {
+			margin: 0px auto;
+			overflow: hidden;
+		    }
+		    .clock-container {
+			background: transparent;
+			float: left;
+			position: relative;
+		    }
+		    .hide {
+			display: none;
+		    }
+		    canvas {
+			position: absolute;
+			z-index: 100;
+		    }
+		    .clock-container > div.city{
+			font-weight: bold;
+			margin-left: auto;
+			margin-right: auto;
+			display: table;
+            color: black;
+		    }
+		    .clock-container > img {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			margin-top: -90px;
+			margin-left: -90px;
+			z-index: 99;
+		    }
+            div.bg {
+                position: absolute;
+                background: white;
+                z-index: -1;
+            }
+		</style>
+		<script src="jquery-1.7.2.js" type="text/javascript"></script>
+		<!--[if IE]><script type="text/javascript" src="excanvas.js"></script><![endif]-->
+		<script src="coolclock.js" type="text/javascript"></script>
+        <!--[if not IE]
+		<script src="jquery.fullscreen.js" type="text/javascript"></script><![endif]-->
+		<script src="date.js" type="text/javascript"></script>
+		<script>
+			var timezone_callback = function(){
+				var banglore = new timezoneJS.Date("Asia/Kolkata"),
+				    stockholm = new timezoneJS.Date("Europe/Stockholm"),
+				    paris = new timezoneJS.Date("Europe/Paris"),
+				    tokyo = new timezoneJS.Date("Asia/Tokyo"),
+				    london = new timezoneJS.Date("Europe/London"),
+				    newyork = new timezoneJS.Date("America/New_York"),
+				    offsets = {
+						  "banglore": -banglore.getTimezoneOffset()/60,
+						  "stockholm": -stockholm.getTimezoneOffset()/60,
+						  "paris": -paris.getTimezoneOffset()/60,
+						  "london": -london.getTimezoneOffset()/60,
+						  "tokyo": -tokyo.getTimezoneOffset()/60,
+						  "newyork": -newyork.getTimezoneOffset()/60,
+					      },
+                    colrs = {
+                          "bangalore": "#000",
+                          "stockholm": "#000",
+                          "paris": "#000",
+                          "london": "#000",
+                          "tokyo": "#000",
+                          "newyork": "#000"
+                    };
+		
+				$(document).ready(function(){
+					var render_clocks = function(){
+						$(window).stop();
+						$("#container").fadeOut(500,function(){
+							var window_width = $(window).width() - 15  - 40,
+							    container_height = ($(window).height() - 20),
+							    container_width = (window_width - (window_width%3)),
+							    cc_width = (container_width / 3),
+							    cc_height = container_height / 2;
+							
+							var clock_radius = cc_width < cc_height ? Math.floor((cc_width - 20)/2): Math.floor((cc_height - 20)/2),
+							    clock_left = cc_width/2 - clock_radius,
+							    clock_top = cc_height/2 - clock_radius,
+							    city_font = Math.floor(clock_radius * 2 * (5/100));
+							$("#container").css({"width": container_width+"px", "height": container_height+"px"});
+							$("#container div.clock-container").css({"width": cc_width+"px", "height": cc_height+"px"});
+							$(".city").css({"font-size": city_font+"px"});
+							$("canvas").css({"left": clock_left+"px", "top": clock_top+"px"});
+                            $("div.bg").css({"left": (clock_left + 2) + "px", "top": (clock_top + 2) +"px", "border-radius": ( clock_radius + 4) + "px", width: ((clock_radius - 2)*2) + "px", "height": ((clock_radius - 2)*2) + "px"});
+							console.log(offsets);
+							$.each($("canvas"), function(){
+							    var city = $(this).attr("id"),
+								clock_class = "CoolClock:IgateNew:"+clock_radius+"::"+offsets[city];
+							    $(this).removeAttr("class");
+							    $(this).addClass(clock_class);
+							});					
+							var $city = $(".city");
+							$.each($city,function(){
+                                var color = colrs[$(this).text().replace(/ /g,"").toLowerCase()];
+								$(this).css({"margin-top": Math.floor(clock_radius*2*(80/100)), "color": color});
+							});
+
+							$("#container").fadeIn();
+							CoolClock.findAndCreateClocks();
+						});
+					}
+					render_clocks();
+					$(window).resize(render_clocks);
+					$(window).bind("fullscreen-toggle", function(e, state) {
+						render_clocks();
+					});
+					$(window).bind("fullscreen-key", function(e, shortcut, longform) {
+						render_clocks();
+					});
+				});
+			}
+			timezoneJS.timezone.zoneFileBasePath = '/tz';
+			timezoneJS.timezone.init({
+				"callback": timezone_callback
+			});
+		</script>
+	</head>
+	<body>
+		<div id="container" style="display:none">
+		    <div class="clock-container">
+			<canvas id="banglore"></canvas>
+			<div class="city">BANGALORE</div>
+			<img src="logo.png"/>
+            <div class="bg"></div>
+		    </div>
+		    <div class="clock-container">
+			<canvas id="stockholm"></canvas>
+			<div class="city">STOCKHOLM</div>
+			<img src="logo.png"/>
+            <div class="bg"></div>
+		    </div>
+		    <div class="clock-container">
+			<canvas id="paris"></canvas>
+			<div class="city">PARIS</div>
+			<img src="logo.png"/>
+            <div class="bg"></div>
+		    </div>
+		    <div class="clock-container">
+			<canvas id="tokyo"></canvas>
+			<div class="city">TOKYO</div>
+			<img src="logo.png"/>
+            <div class="bg"></div>
+		    </div>
+		    <div class="clock-container">
+			<canvas id="newyork"></canvas>
+			<div class="city">NEW YORK</div>
+			<img src="logo.png"/>
+            <div class="bg"></div>
+		    </div>
+		    <div class="clock-container">
+			<canvas id="london"></canvas>
+			<div class="city">LONDON</div>
+			<img src="logo.png"/>
+            <div class="bg"></div>
+		    </div>
+		</div>
+	</body>
+</html>
